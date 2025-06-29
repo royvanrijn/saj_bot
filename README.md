@@ -12,10 +12,16 @@ All collected sensor data and decisions are stored in a local H2 database so tha
 - Stores data points in an embedded H2 database.
 - Built using Java 17, Maven and Spring Boot.
 
+## Maven proxy settings
+
+Maven requires network access to download dependencies. The included
+`settings.xml` configures a proxy so builds work behind a firewall. Use
+the file with the `-s` flag whenever running Maven.
+
 ## Running locally
 
 ```
-mvn spring-boot:run
+mvn -s settings.xml spring-boot:run
 ```
 
 After startup the REST endpoints will be available on `http://localhost:8080/api`.
@@ -24,7 +30,7 @@ After startup the REST endpoints will be available on `http://localhost:8080/api
 Umbrel allows running Docker based applications. Build the container and deploy it via the Umbrel interface:
 
 ```
-mvn package
+mvn -s settings.xml package
 docker build -t sajbot .
 docker run -p 8080:8080 sajbot
 ```
