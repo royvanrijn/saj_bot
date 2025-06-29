@@ -34,6 +34,10 @@ public class WeatherService {
         return 0;
     }
 
+    /**
+     * Retrieve hourly solar forecast for the next 24 hours. Each entry
+     * represents the predicted solar output percentage for that hour.
+     */
     public List<Double> getHourlySolarForecast() {
         List<Double> result = new ArrayList<>();
         String url = "https://api.openweathermap.org/data/2.5/forecast?q=" + location + "&appid=" + apiKey + "&units=metric";
