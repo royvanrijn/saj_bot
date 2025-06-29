@@ -16,8 +16,8 @@ class PriceServiceTest {
         RestTemplate template = new RestTemplate();
         MockRestServiceServer server = MockRestServiceServer.bindTo(template).build();
         String url = "http://test/prices";
-        server.expect(ExpectedCount.times(2), requestTo(url))
-                .andRespond(withSuccess("{\"importPrice\":0.12,\"exportPrice\":0.34}", MediaType.APPLICATION_JSON));
+        server.expect(ExpectedCount.times(4), requestTo(url))
+                .andRespond(withSuccess("{\"importPrice\":0.12,\"exportPrice\":0.34,\"importPrices\":[0.1,0.2],\"exportPrices\":[0.3,0.4]}", MediaType.APPLICATION_JSON));
 
         PriceService service = new PriceService(url);
         // inject RestTemplate using reflection for simplicity
@@ -27,6 +27,8 @@ class PriceServiceTest {
 
         assertEquals(0.12, service.getCurrentImportPrice(), 1e-6);
         assertEquals(0.34, service.getCurrentExportPrice(), 1e-6);
+        assertEquals(java.util.List.of(0.1, 0.2), service.getImportPriceForecast());
+        assertEquals(java.util.List.of(0.3, 0.4), service.getExportPriceForecast());
         server.verify();
     }
 }
