@@ -30,4 +30,26 @@ public class WeatherService {
         }
         return 0;
     }
+
+    /**
+     * Retrieve hourly solar forecast for the next 24 hours. Each entry
+     * represents the predicted solar output percentage for that hour.
+     */
+    public double[] getHourlySolarForecast() {
+        String url = "https://api.openweathermap.org/data/2.5/forecast?q=" + location + "&appid=" + apiKey + "&units=metric";
+        try {
+            var node = restTemplate.getForObject(url, com.fasterxml.jackson.databind.JsonNode.class);
+            if (node != null) {
+                var list = node.get("list");
+                int len = Math.min(24, list.size());
+                double[] result = new double[len];
+                for (int i = 0; i < len; i++) {
+                    result[i] = 100 - list.get(i).get("clouds").get("all").asDouble();
+                }
+                return result;
+            }
+        } catch (Exception ignored) {
+        }
+        return new double[0];
+    }
 }

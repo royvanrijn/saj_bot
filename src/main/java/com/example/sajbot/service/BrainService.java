@@ -26,18 +26,50 @@ public class BrainService {
 
     @Scheduled(fixedRate = 3600000)
     public void evaluate() {
-        double solarForecast = weatherService.getPredictedSolar();
-        double importPrice = priceService.getCurrentImportPrice();
-        double exportPrice = priceService.getCurrentExportPrice();
+        double[] solar = weatherService.getHourlySolarForecast();
+        double[] imports = priceService.getHourlyImportPrices();
+        double[] exports = priceService.getHourlyExportPrices();
 
-        // Simple algorithm: if solar forecast is low and import price is low -> charge
-        if (solarForecast < 50 && importPrice < 0.20) {
-            batteryService.charge(10);
+        int hours = Math.min(Math.min(solar.length, imports.length), exports.length);
+        if (hours == 0) {
+            solar = new double[] { weatherService.getPredictedSolar() };
+            imports = new double[] { priceService.getCurrentImportPrice() };
+            exports = new double[] { priceService.getCurrentExportPrice() };
+            hours = 1;
         }
-        // If export price high and battery high -> discharge
-        if (exportPrice > 0.30 && batteryService.getBatteryLevel() > 20) {
+
+        int bestChargeHour = 0;
+        int bestDischargeHour = 0;
+        double bestChargeScore = Double.MAX_VALUE;
+        double bestDischargePrice = Double.MIN_VALUE;
+        for (int i = 0; i < hours; i++) {
+            double score = imports[i] - solar[i] / 100.0;
+            if (score < bestChargeScore) {
+                bestChargeScore = score;
+                bestChargeHour = i;
+            }
+            if (exports[i] > bestDischargePrice) {
+                bestDischargePrice = exports[i];
+                bestDischargeHour = i;
+            }
+        }
+
+        int currentHour = LocalDateTime.now().getHour() % hours;
+
+        if (currentHour == bestChargeHour) {
+            batteryService.charge(10);
+        } else if (currentHour == bestDischargeHour && batteryService.getBatteryLevel() > 20) {
             batteryService.discharge(10);
         }
-        repository.save(new DataPoint(LocalDateTime.now(), batteryService.getBatteryLevel(), importPrice, exportPrice, solarForecast));
+
+        if (currentHour >= 0 && currentHour < 6 && batteryService.getBatteryLevel() < 20) {
+            batteryService.charge(20 - batteryService.getBatteryLevel());
+        }
+
+        repository.save(new DataPoint(LocalDateTime.now(),
+                batteryService.getBatteryLevel(),
+                imports[Math.min(currentHour, imports.length - 1)],
+                exports[Math.min(currentHour, exports.length - 1)],
+                solar[Math.min(currentHour, solar.length - 1)]));
     }
 }
