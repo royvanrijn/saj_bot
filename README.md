@@ -6,11 +6,26 @@ All collected sensor data and decisions are stored in a local H2 database so tha
 
 ## Features
 - REST API that exposes the current battery level, collected data and a summary endpoint.
-- Reads a weather API based on the location configured in `application.yml`.
+- Reads hourly weather forecasts from **OpenWeatherMap** based on the location
+  configured in `application.yml` and uses this data to predict solar output for
+  the next hour.
 - Reads electricity prices from a configurable endpoint.
 - Simple "brain" that periodically evaluates the situation and charges/discharges the battery.
 - Stores data points in an embedded H2 database.
 - Built using Java 17, Maven and Spring Boot.
+
+## Configuration
+
+Set the following properties in `src/main/resources/application.yml` to
+customise the bot:
+
+- `weather.api-key` &ndash; OpenWeatherMap API key used to retrieve the hourly
+  forecast.
+- `weather.location` &ndash; Location string recognised by OpenWeatherMap.
+- `electricity.price-url` &ndash; Endpoint that returns import and export
+  prices.
+- `saj.host` &ndash; Hostname or IP address of the SAJ inverter.
+- `saj.port` &ndash; Modbus TCP port of the SAJ inverter.
 
 ## Maven proxy settings
 
@@ -21,7 +36,7 @@ the file with the `-s` flag whenever running Maven.
 ## Running locally
 
 ```
-mvn spring-boot:run
+mvn -s settings.xml spring-boot:run
 ```
 
 ### Running tests
@@ -36,7 +51,7 @@ After startup the REST endpoints will be available on `http://localhost:8080/api
 Umbrel allows running Docker based applications. Build the container and deploy it via the Umbrel interface:
 
 ```
-mvn -s settings.xml package
+mvn -s settings.xml -DskipTests package
 docker build -t sajbot .
 docker run -p 8080:8080 sajbot
 ```
