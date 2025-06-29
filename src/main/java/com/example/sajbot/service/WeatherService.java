@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class WeatherService {
 
@@ -29,5 +32,22 @@ public class WeatherService {
         } catch (Exception ignored) {
         }
         return 0;
+    }
+
+    public List<Double> getHourlySolarForecast() {
+        List<Double> result = new ArrayList<>();
+        String url = "https://api.openweathermap.org/data/2.5/forecast?q=" + location + "&appid=" + apiKey + "&units=metric";
+        try {
+            var node = restTemplate.getForObject(url, com.fasterxml.jackson.databind.JsonNode.class);
+            if (node != null) {
+                var list = node.get("list");
+                for (int i = 0; i < 24 && i < list.size(); i++) {
+                    double clouds = list.get(i).get("clouds").get("all").asDouble();
+                    result.add(100 - clouds);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return result;
     }
 }
