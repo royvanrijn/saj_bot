@@ -5,7 +5,7 @@ Using weather forecasts and electricity prices the bot decides when the battery 
 All collected sensor data and decisions are stored in a local H2 database so that the algorithm can be tuned in the future.
 
 ## Features
-- REST API that exposes the current battery level and collected data.
+- REST API that exposes the current battery level, collected data and a summary endpoint.
 - Reads a weather API based on the location configured in `application.yml`.
 - Reads electricity prices from a configurable endpoint.
 - Simple "brain" that periodically evaluates the situation and charges/discharges the battery.
@@ -22,6 +22,12 @@ the file with the `-s` flag whenever running Maven.
 
 ```
 mvn spring-boot:run
+```
+
+### Running tests
+
+```
+mvn -s settings.xml test
 ```
 
 After startup the REST endpoints will be available on `http://localhost:8080/api`.
