@@ -21,7 +21,7 @@ the file with the `-s` flag whenever running Maven.
 ## Running locally
 
 ```
-mvn -s settings.xml spring-boot:run
+mvn spring-boot:run
 ```
 
 After startup the REST endpoints will be available on `http://localhost:8080/api`.
