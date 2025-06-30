@@ -17,10 +17,10 @@ public class SajConnectionTest {
         String host = System.getenv().getOrDefault("SAJ_HOST", "127.0.0.1");
         int port = Integer.parseInt(System.getenv().getOrDefault("SAJ_PORT", "502"));
 
+        System.out.println("Connecting to SAJ inverter at " + host + ":" + port);
         SajInverterService service = new SajInverterService(host, port);
         try {
             SajRealtimeData data = service.readRealtimeData();
-            System.out.println("Connected to SAJ inverter at " + host + ":" + port);
             System.out.println("Power: " + data.getPower() + " W");
             System.out.println("PV1 Voltage: " + data.getPv1volt() + " V");
             System.out.println("Timestamp: " + data.getDatetime());

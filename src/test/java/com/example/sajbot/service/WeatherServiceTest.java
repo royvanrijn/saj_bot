@@ -1,14 +1,15 @@
 package com.example.sajbot.service;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-
-import static org.junit.jupiter.api.Assertions.*;
-import org.springframework.test.web.client.ExpectedCount;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
 class WeatherServiceTest {
     @Test
@@ -41,7 +42,7 @@ class WeatherServiceTest {
         f.setAccessible(true);
         f.set(service, template);
 
-        assertEquals(java.util.List.of(90.0, 80.0), service.getHourlySolarForecast());
+        assertArrayEquals(new double[] {90.0, 80.0}, service.getHourlySolarForecast());
         server.verify();
     }
 }
